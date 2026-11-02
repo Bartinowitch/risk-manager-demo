@@ -1,0 +1,1127 @@
+/* Atinote — design system v2 (2026) */
+
+/* ── Fonts ─────────────────────────────────────────────────────── */
+/* Inter, self-hosted since 26.10.2026. Before, an @import pulled it from
+   fonts.googleapis.com, which sent every visitor's IP address to Google.
+   Files: @fontsource-variable/inter 5.2.8 (SIL Open Font License, fonts/OFL.txt).
+   The weight range stays 400 to 600, as the Google request had it, so a page
+   asking for 700 still renders at 600 and nothing changes visually. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 600;
+  src: url('../fonts/inter-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 600;
+  src: url('../fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* ── Design tokens — Light ──────────────────────────────────────── */
+:root {
+  --bg:               #FAF9F5;
+  --bg-subtle:        #F0EEE6;
+  --surface:          #F5F3EC;
+  --surface-elevated: #FDFCF8;
+  --surface-hover:    #EFEDE3;
+  --ink:              #141413;
+  --ink-muted:        #6B6A63;
+  --ink-faint:        #9B9990;
+  --ink-strong-hover: #33322E;
+  --accent:           #3D7A5C;
+  --accent-soft:      #2E6047;
+  --on-accent:        #FFFFFF;
+  --header-bg:        rgba(250,249,245,0.82);
+  --border:           rgba(20,20,19,0.12);
+  --border-subtle:    rgba(20,20,19,0.07);
+  --shadow-sm:        0 1px 3px rgba(20,20,19,0.06), 0 1px 2px rgba(20,20,19,0.04);
+  --shadow-md:        0 4px 16px rgba(20,20,19,0.07), 0 1px 4px rgba(20,20,19,0.04);
+  --radius:           10px;
+  --radius-lg:        16px;
+  --radius-xl:        20px;
+  --max-width:        1080px;
+  --narrow:           680px;
+  --ease:             cubic-bezier(0.4, 0, 0.2, 1);
+  --duration:         0.22s;
+
+  color-scheme: light;
+}
+
+/* ── Dark mode ──────────────────────────────────────────────────── */
+/* Hier stand bis zum 16.08.2026 ein `[data-theme="dark"],` vor dem @media.
+   Ein Selektor vor einer At-Regel ist ungueltiges CSS, der Browser verwarf
+   den ganzen Block, und damit hat die Systemeinstellung auf keiner Seite
+   gewirkt. Nur der Knopf funktionierte, ueber den zweiten Block weiter unten. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:               #0F0E0C;
+    --bg-subtle:        #171613;
+    --surface:          #1E1D1A;
+    --surface-elevated: #26241F;
+    --surface-hover:    #2B2925;
+    --ink:              #F5F3EE;
+    --ink-muted:        #94918A;
+    --ink-faint:        #57544D;
+    --ink-strong-hover: #E2DFD8;
+    --accent:           #52A87A;
+    --accent-soft:      #6AC490;
+    --on-accent:        #0F0E0C;
+    --header-bg:        rgba(15,14,12,0.82);
+    --border:           rgba(245,243,238,0.10);
+    --border-subtle:    rgba(245,243,238,0.06);
+    --shadow-sm:        0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md:        0 4px 24px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+}
+
+[data-theme="dark"] {
+  --bg:               #0F0E0C;
+  --bg-subtle:        #171613;
+  --surface:          #1E1D1A;
+  --surface-elevated: #26241F;
+  --surface-hover:    #2B2925;
+  --ink:              #F5F3EE;
+  --ink-muted:        #94918A;
+  --ink-faint:        #57544D;
+  --ink-strong-hover: #E2DFD8;
+  --accent:           #52A87A;
+  --accent-soft:      #6AC490;
+  --on-accent:        #0F0E0C;
+  --header-bg:        rgba(15,14,12,0.82);
+  --border:           rgba(245,243,238,0.10);
+  --border-subtle:    rgba(245,243,238,0.06);
+  --shadow-sm:        0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:        0 4px 24px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+/* ── Reset & base ───────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--duration) var(--ease);
+}
+
+a:hover {
+  color: var(--accent-soft);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Shared layout ──────────────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--header-bg);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--duration) var(--ease);
+}
+
+[data-theme="dark"] .site-header {
+  background: var(--header-bg);
+}
+
+.nav-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Fallback for sub-pages that don't use .nav-inner */
+.site-header > .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 60px;
+  padding: 0 32px;
+}
+
+@media (max-width: 720px) {
+  .site-header > .brand {
+    padding: 0 20px;
+  }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.brand:hover {
+  color: var(--ink);
+}
+
+/* Breadcrumb-Stil: "Atinote / Tool" statt Pille */
+.nav-tool-label {
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ink-secondary);
+}
+
+.nav-tool-label::before {
+  content: '/';
+  color: var(--ink-muted);
+  margin-right: 6px;
+}
+
+.brand-mark {
+  display: block;
+  width: auto;
+  height: 32px;
+  border-radius: 7px;
+  object-fit: contain;
+}
+
+.site-nav {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+  flex: 1;
+}
+
+.site-nav a {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  transition: color var(--duration) var(--ease), background var(--duration) var(--ease);
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  color: var(--ink);
+  background: var(--surface-hover);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Dark mode toggle */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+
+.theme-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
+/* Hide the correct icon based on theme */
+.icon-sun  { display: none; }
+.icon-moon { display: block; }
+[data-theme="dark"] .icon-sun  { display: block; }
+[data-theme="dark"] .icon-moon { display: none; }
+
+/* ── Main ───────────────────────────────────────────────────────── */
+main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 32px 120px;
+}
+
+main.narrow {
+  max-width: var(--narrow);
+}
+
+/* ── Section label ──────────────────────────────────────────────── */
+.section-label {
+  margin: 0 0 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+
+/* ── Badge ──────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+
+/* ── Hint text ──────────────────────────────────────────────────── */
+.hint {
+  font-size: 0.8em;
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--duration) var(--ease),
+    border-color var(--duration) var(--ease),
+    color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+  white-space: nowrap;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+/* Primary — near-black pill (SaaS standard) */
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.btn-primary:hover {
+  background: var(--ink-strong-hover);
+  border-color: var(--ink-strong-hover);
+  color: var(--bg);
+}
+
+/* Secondary — transparent with border */
+.btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+/* Accent — green */
+.btn-accent {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.btn-accent:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--on-accent);
+}
+
+.btn-sm {
+  padding: 6px 13px;
+  font-size: 0.8rem;
+}
+
+.btn-lg {
+  padding: 13px 24px;
+  font-size: 0.95rem;
+}
+
+/* Danger */
+.po-danger,
+.btn-danger {
+  color: #c0392b;
+  border-color: rgba(192,57,43,0.3);
+}
+
+.po-danger:hover,
+.btn-danger:hover {
+  background: rgba(192,57,43,0.08);
+  border-color: rgba(192,57,43,0.5);
+  color: #a0231a;
+}
+
+/* ── Cards ──────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+
+/* ── Hero (homepage) ────────────────────────────────────────────── */
+.hero {
+  padding: 72px 0 88px;
+}
+
+.hero h1 {
+  margin: 0 0 20px;
+  font-size: clamp(2.25rem, 6vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.hero .lead {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+  line-height: 1.7;
+}
+
+.hero-left {
+  padding: 24px 0 56px;
+}
+
+.hero-left .lead {
+  max-width: 44ch;
+}
+
+/* 404 page: the way back into the site */
+.notfound-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 96px;
+}
+
+/* ── Hub list (sub-pages) ───────────────────────────────────────── */
+.hub-section {
+  padding-top: 8px;
+}
+
+.hub-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hub-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 6px 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    border-color var(--duration) var(--ease),
+    padding-left var(--duration) var(--ease);
+}
+
+.hub-link:first-child {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.hub-link:hover {
+  color: var(--ink);
+  border-color: var(--border);
+  padding-left: 6px;
+}
+
+.hub-link-title {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hub-link-desc {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.55;
+  max-width: 44ch;
+}
+
+.hub-link-arrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  color: var(--ink-faint);
+  font-size: 1rem;
+  transition:
+    color var(--duration) var(--ease),
+    transform var(--duration) var(--ease);
+}
+
+.hub-link:hover .hub-link-arrow {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+.hub-link-muted {
+  opacity: 0.65;
+}
+
+.hub-link-muted:hover {
+  opacity: 1;
+}
+
+/* ── Tile grid (sub-page overviews) ─────────────────────────────────
+   Shared card grid for /apps/, /tools/ and /case-studies/. Same shape as
+   the home page bento cards and the /fun/ tiles, but living here because
+   home.css and fun.css are page-scoped. Replaced the full-width
+   .hub-link rows, which stretched a two-line description across the
+   whole page.
+   ------------------------------------------------------------------ */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 80px;
+}
+
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink);
+  text-decoration: none;
+  display: block;
+  overflow: hidden;
+  transition:
+    box-shadow 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+
+.tile:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border);
+  transform: translateY(-2px);
+  color: var(--ink);
+}
+
+.tile-inner {
+  padding: 28px 28px 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tile-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.tile-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+.tile-arrow {
+  font-size: 1rem;
+  color: var(--ink-faint);
+  transition: transform 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.tile:hover .tile-arrow {
+  transform: translateX(4px);
+  color: var(--accent);
+}
+
+.tile-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.tile-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  max-width: 40ch;
+}
+
+/* App icon inside a tile — the real App Store artwork, so it carries the
+   iOS squircle radius rather than the site radius. */
+.tile-iconrow {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.tile-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(20,20,19,0.18);
+}
+
+/* A tile without a page yet (an app still in development) is a div, not a link:
+   it keeps its resting look on hover. */
+div.tile:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border-subtle);
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .tile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── App cards (apps/ page) ─────────────────────────────────────── */
+.app-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.app-card {
+  padding: 36px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.app-card:first-child {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.app-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.app-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.app-icon-placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.app-card h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.app-card .tagline {
+  margin: 5px 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+}
+
+.app-card .description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  max-width: 52ch;
+  line-height: 1.65;
+}
+
+.app-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* ── App microsite ──────────────────────────────────────────────── */
+.app-hero {
+  padding: 24px 0 56px;
+}
+
+.app-hero h1 {
+  margin: 0 0 16px;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.app-hero .lead {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 1.05rem;
+  color: var(--ink-muted);
+  line-height: 1.65;
+}
+
+.app-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.app-section {
+  padding-bottom: 56px;
+}
+
+/* ── Screenshots carousel ───────────────────────────────────────── */
+.screenshots {
+  padding-bottom: 72px;
+}
+
+.carousel-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.carousel-track {
+  display: flex;
+  width: 100%;
+  transition: transform var(--duration) var(--ease);
+}
+
+.carousel-page {
+  flex: 0 0 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.screenshot-frame {
+  margin: 0;
+  min-width: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.screenshot-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(56vh, 480px);
+  object-fit: contain;
+  object-position: top center;
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.carousel-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink-muted);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+
+.carousel-btn:hover:not(:disabled) {
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+.carousel-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-dot {
+  appearance: none;
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: background var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+
+.carousel-dot.is-active {
+  background: var(--ink);
+  transform: scale(1.2);
+}
+
+/* ── Content list ───────────────────────────────────────────────── */
+.content-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.content-list li {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+.content-list strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+
+.content-list p {
+  margin: 0;
+}
+
+.text-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.875rem;
+  color: var(--accent);
+}
+
+.text-link:hover {
+  color: var(--accent-soft);
+}
+
+/* ── Panels (content pages) ─────────────────────────────────────── */
+.panel {
+  padding: 32px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0;
+}
+
+.panel:first-of-type {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+
+.panel h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.panel p:last-child,
+.panel ul:last-child {
+  margin-bottom: 0;
+}
+
+.panel ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.panel li + li {
+  margin-top: 8px;
+}
+
+/* ── Timeline / expandable stations ─────────────────────────────── */
+/* Click-to-expand list. Used by the About career timeline and by the
+   case study pipeline diagram — keep it generic, page-specific extras
+   belong in the page stylesheet. */
+.eyebrow-row { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.eyebrow-hint { font-size: 0.8rem; font-style: italic; color: var(--ink-muted); }
+
+.timeline { margin: 16px -12px 0; }
+.t-item {
+  position: relative; margin-bottom: 8px; padding: 16px 40px 16px 32px;
+  cursor: pointer; border-radius: var(--radius); border: 1px solid transparent;
+  transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+}
+.t-item:last-child { margin-bottom: 0; }
+.t-item:hover, .t-item.open {
+  background: var(--surface); border-color: var(--border-subtle); box-shadow: var(--shadow-sm);
+}
+.t-item::before {
+  content: ''; position: absolute; left: 14px; top: 22px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-faint);
+  transition: transform var(--duration) var(--ease), background var(--duration) var(--ease);
+}
+.t-item:hover::before { background: var(--accent); transform: scale(1.3); }
+.t-item.open::before { background: var(--ink); transform: scale(1.3); }
+.t-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.t-year { font-size: 0.8rem; color: var(--ink-muted); min-width: 96px; }
+.t-title { font-size: 0.95rem; font-weight: 600; color: var(--ink); transition: color var(--duration) var(--ease); }
+.t-item:hover .t-title { color: var(--accent); }
+.t-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; font-size: 0.875rem; color: var(--ink-muted); }
+.t-detail p { margin: 0 0 6px; }
+.t-detail p:last-child { margin-bottom: 0; }
+.t-item:hover .t-detail, .t-item.open .t-detail { max-height: 260px; margin-top: 8px; }
+.t-chevron { position: absolute; right: 16px; top: 18px; font-size: 0.75rem; color: var(--ink-faint); transition: transform 0.2s ease; }
+.t-item.open .t-chevron { transform: rotate(90deg); }
+
+/* ── Legal / docs ───────────────────────────────────────────────── */
+.page-title {
+  margin: 0 0 12px;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.page-meta {
+  margin: 0 0 48px;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  max-width: 42ch;
+  line-height: 1.65;
+}
+
+.doc h2 {
+  font-size: 1.05rem;
+  margin: 32px 0 10px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.doc p,
+.doc ul {
+  margin: 0 0 14px;
+  color: var(--ink-muted);
+}
+
+.doc ul {
+  padding-left: 1.2rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 32px;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.back-link:hover {
+  color: var(--ink);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+.site-footer {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 36px 32px 56px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+}
+
+.site-footer a {
+  color: var(--ink-faint);
+  transition: color var(--duration) var(--ease);
+}
+
+.site-footer a:hover {
+  color: var(--ink-muted);
+}
+
+/* ── Search mark (highlight) ────────────────────────────────────── */
+mark.search-mark {
+  background: rgba(61,122,92,0.18);
+  color: var(--ink);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  main {
+    padding: 0 20px 80px;
+  }
+
+  .nav-inner {
+    padding: 0 20px;
+    gap: 16px;
+  }
+
+  .site-nav a {
+    padding: 6px 8px;
+    font-size: 0.83rem;
+  }
+
+  .site-footer {
+    padding: 28px 20px 44px;
+  }
+
+  .hero {
+    padding: 48px 0 64px;
+  }
+
+  .hub-link {
+    padding: 22px 0;
+  }
+
+  .hub-link:hover {
+    padding-left: 0;
+  }
+
+  .carousel-page {
+    gap: 8px;
+  }
+
+  .screenshot-frame img {
+    max-height: min(44vh, 360px);
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-inner {
+    gap: 6px;
+  }
+
+  .brand-mark {
+    height: 26px;
+  }
+
+  .site-nav {
+    gap: 0;
+    margin-left: 2px;
+  }
+
+  /* Fünf Menüpunkte statt vier seit dem Fun-Bereich. Bei 0.72rem/5px
+     brach die Zeile auf einem 375er Display um; diese Werte halten sie
+     einzeilig. */
+  .site-nav a {
+    padding: 6px 4px;
+    font-size: 0.68rem;
+  }
+
+  .nav-actions {
+    margin-left: 4px;
+  }
+}

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+  <link rel="icon" href="animated-icon.svg" type="image/svg+xml">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Risk Manager demo · Atinote</title>
+  <meta name="description" content="Try the Risk Manager with a made-up product launch: risk register, heat map, scoring and mitigations. No login and no AI coach. Changes stay in your browser.">
+  <link rel="stylesheet" href="css/atinote.css?v=4">
+  <link rel="stylesheet" href="css/project-overview.css?v=2">
+  <link rel="stylesheet" href="css/risk-manager.css?v=34">
+  <style>.rm-demo-note{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:0 0 14px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--ink-muted);font-size:.875rem}</style>
+</head>
+<body class="po-app">
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="https://atinote.ch/">
+        <img class="brand-mark" src="animated-icon.svg" alt="Atinote">
+        Atinote
+        <span class="nav-tool-label">Risk Manager</span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="https://atinote.ch/tools/">← Tools</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <span class="icon-moon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 10.5A6 6 0 0 1 5.5 2.5a6 6 0 1 0 8 8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="icon-sun" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.42 1.42M11.36 11.36l1.42 1.42M11.36 4.64l-1.42 1.42M4.64 11.36 3.22 12.78" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="tool-project">
+    <div class="rm-demo-note" role="note"><span>Demo with made-up data. No login and no AI coach. Changes stay in this browser.</span><button type="button" class="rm-linklike" onclick="submitSyncLogout()">Reset demo</button></div>
+    <div class="po-toolbar rm-toolbar">
+      <div class="po-actions rm-toolbar-actions">
+        <button type="button" class="btn btn-primary btn-sm rm-needs-edit" id="addRiskBtn" onclick="openRiskModal(null)" title="Add a new risk">Add risk</button>
+        <div class="rm-menu" id="rmMenu">
+          <button type="button" class="rm-menu-trigger" id="rmMenuBtn" onclick="toggleMainMenu(event)" aria-expanded="false" aria-haspopup="true" aria-label="Menu" title="Menu">
+            <span class="rm-menu-icon" aria-hidden="true"></span>
+          </button>
+          <div class="rm-menu-panel" id="rmMenuPanel" role="menu" hidden>
+            <div class="rm-submenu" id="rmRegisterSub">
+              <button type="button" class="rm-menu-item rm-submenu-trigger" id="rmRegisterSubBtn" onclick="toggleSubmenu('rmRegister', event)" aria-expanded="false" aria-haspopup="true">
+                <span>Register</span>
+                <span class="rm-submenu-caret" aria-hidden="true"></span>
+              </button>
+              <div class="rm-submenu-body" id="rmRegisterSubBody" hidden>
+                <div class="rm-menu-areas" id="rmMenuRegisters"></div>
+                <button type="button" class="rm-menu-subitem" id="rmNewRegister" role="menuitem" onclick="createNewProject(); closeMainMenu()">New register</button>
+              </div>
+            </div>
+            <div class="rm-submenu" id="rmAreaSub">
+              <button type="button" class="rm-menu-item rm-submenu-trigger" id="rmAreaSubBtn" onclick="toggleSubmenu('rmArea', event)" aria-expanded="false" aria-haspopup="true">
+                <span>Areas</span>
+                <span class="rm-submenu-caret" aria-hidden="true"></span>
+              </button>
+              <div class="rm-submenu-body" id="rmAreaSubBody" hidden>
+                <button type="button" class="rm-menu-subitem rm-needs-edit" role="menuitem" onclick="openAreaModal(null); closeMainMenu()">Add area</button>
+                <div class="rm-menu-areas" id="rmMenuAreas"></div>
+              </div>
+            </div>
+            <button type="button" class="rm-menu-item" role="menuitem" onclick="exportPDF(); closeMainMenu()">Export PDF</button>
+            <button type="button" class="rm-menu-item" role="menuitem" id="rmMenuMembers" hidden onclick="openMembersModal(); closeMainMenu()">Members…</button>
+            <button type="button" class="rm-menu-item" role="menuitem" onclick="openSyncModal(); closeMainMenu()">Account…</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rm-hero">
+      <div class="rm-hero-row">
+        <h1 class="rm-page-title" id="projectTitle" contenteditable="true" spellcheck="false" title="Click to rename"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+          onblur="saveMeta()">Risk Register</h1>
+      </div>
+      <div class="po-updated rm-hero-updated" title="Date and time of the last change synced for this register">
+        Last updated
+        <span id="lastUpdate"></span>
+      </div>
+    </div>
+
+    <!-- Register (PO Risks tab UX) -->
+    <section class="po-view active" id="view-register">
+      <div class="po-risk-summary" id="riskSummary"></div>
+      <div class="po-risk-matrix-wrap">
+        <div class="po-risk-matrix" id="riskMatrix" aria-label="Risk heat map"></div>
+      </div>
+      <div class="rm-register-head">
+        <p class="section-label">Risk register</p>
+        <button type="button" class="rm-reset-filters" id="rmResetFilters" onclick="clearAllRiskFilters()" hidden>Reset filters &amp; sort</button>
+      </div>
+      <div class="po-table-wrap" id="risksTabBody"></div>
+    </section>
+  </main>
+
+  <!-- Risk modal -->
+  <div class="po-modal-bg" id="riskModalBg" onclick="modalBgClick(event,'riskModalBg')">
+    <div class="po-modal po-onepager" role="dialog" aria-labelledby="riskModalTitle" onclick="event.stopPropagation()">
+      <h2 id="riskModalTitle">Add risk</h2>
+      <div class="po-form-grid">
+        <div class="po-form-group">
+          <label for="riskArea" class="rm-tip-label" data-tip="The thematic group this risk belongs to, e.g. delivery, vendor, compliance.">Area <span class="rm-tip-icon">?</span></label>
+          <select id="riskArea"></select>
+        </div>
+        <div class="po-form-group">
+          <label for="riskTitle" class="rm-tip-label" data-tip="Short label for this risk, used in lists and the heat map.">Risk title <span class="rm-tip-icon">?</span></label>
+          <input type="text" id="riskTitle" placeholder="Short name, e.g. Vendor delay">
+        </div>
+        <div class="po-form-group full">
+          <label for="riskDesc" class="rm-tip-label" data-tip="Describe the uncertain event: what could happen if this risk materialises?">Risk event <span class="hint">what could happen?</span> <span class="rm-tip-icon">?</span></label>
+          <textarea id="riskDesc" rows="2" placeholder="Describe the uncertain event"></textarea>
+        </div>
+        <div class="po-form-group full">
+          <label for="riskLikelihood" class="rm-tip-label" data-tip="How likely is this risk to occur? 1 = rare, 5 = almost certain. Combined with impact for the heat map.">Likelihood <span class="rm-tip-icon">?</span></label>
+          <div class="rm-scale" id="riskLikelihoodScale"></div>
+          <select id="riskLikelihood" class="rm-scale-select" onchange="updateRiskPreview()"></select>
+        </div>
+        <div class="po-form-group full">
+          <label for="riskImpact" class="rm-tip-label" data-tip="How severe would the impact be if it occurs? 1 = negligible, 5 = severe. Combined with likelihood for the heat map.">Impact severity <span class="rm-tip-icon">?</span></label>
+          <div class="rm-scale" id="riskImpactScale"></div>
+          <select id="riskImpact" class="rm-scale-select" onchange="updateRiskPreview()"></select>
+        </div>
+        <div class="rm-score-row full">
+          <span class="rm-score-label rm-tip-label" data-tip="Inherent risk score before mitigation: Likelihood × Impact (1 to 25). Critical ≥16, High ≥10, Medium ≥5.">Inherent score <span class="rm-tip-icon">?</span></span>
+          <div class="po-risk-preview" id="riskScorePreview"></div>
+        </div>
+
+        <details class="rm-section full" id="secAnalysis">
+          <summary class="rm-section-head">
+            <span class="rm-section-title">Analysis</span>
+            <span class="rm-section-sub">cause &amp; consequence</span>
+            <span class="rm-section-count" data-count="secAnalysis"></span>
+          </summary>
+          <div class="rm-section-body">
+            <div class="po-form-group full">
+              <label for="riskCause" class="rm-tip-label" data-tip="Root cause or trigger: why might this risk occur? What conditions would lead to it?">Cause / trigger <span class="rm-tip-icon">?</span></label>
+              <textarea id="riskCause" rows="2" placeholder="Why might this occur?"></textarea>
+            </div>
+            <div class="po-form-group full">
+              <label for="riskConsequence" class="rm-tip-label" data-tip="Effect on the project if the risk happens: scope, schedule, cost, quality, reputation.">Impact if it occurs <span class="rm-tip-icon">?</span></label>
+              <textarea id="riskConsequence" rows="2" placeholder="Effect on scope, schedule, cost, quality…"></textarea>
+            </div>
+          </div>
+        </details>
+
+        <details class="rm-section full" id="secResponse">
+          <summary class="rm-section-head">
+            <span class="rm-section-title">Response</span>
+            <span class="rm-section-sub">strategy &amp; mitigation</span>
+            <span class="rm-section-count" data-count="secResponse"></span>
+          </summary>
+          <div class="rm-section-body">
+            <div class="po-form-group full">
+              <label for="riskStrategy" class="rm-tip-label" data-tip="How you plan to deal with this risk: reduce it (mitigate), shift it (transfer), accept it, or eliminate it (avoid).">Response strategy <span class="rm-tip-icon">?</span></label>
+              <select id="riskStrategy">
+                <option value="mitigate">Mitigate: reduce likelihood or impact</option>
+                <option value="transfer">Transfer: shift to third party (insurance, contract)</option>
+                <option value="accept">Accept: acknowledge and monitor</option>
+                <option value="avoid">Avoid: change plan to eliminate risk</option>
+              </select>
+            </div>
+            <div class="po-form-group full">
+              <label for="riskMitigation" class="rm-tip-label" data-tip="Concrete actions to reduce likelihood or impact before the risk occurs.">Mitigation actions <span class="rm-tip-icon">?</span></label>
+              <textarea id="riskMitigation" rows="2" placeholder="Concrete steps to reduce the risk"></textarea>
+            </div>
+            <div class="po-form-group">
+              <label for="riskMitOwner" class="rm-tip-label" data-tip="Person responsible for carrying out the mitigation actions.">Mitigation owner <span class="rm-tip-icon">?</span></label>
+              <select id="riskMitOwner"></select>
+            </div>
+            <div class="po-form-group">
+              <label for="riskMitDue" class="rm-tip-label" data-tip="Target date by which mitigation actions should be completed.">Mitigation due <span class="rm-tip-icon">?</span></label>
+              <input type="date" id="riskMitDue">
+            </div>
+            <div class="po-form-group full">
+              <label for="riskContingency" class="rm-tip-label" data-tip="Fallback plan if the risk happens despite mitigation: what you do when it materialises.">Contingency plan <span class="rm-tip-icon">?</span></label>
+              <textarea id="riskContingency" rows="2" placeholder="What we do if the risk materialises"></textarea>
+            </div>
+            <div class="po-form-group full">
+              <label for="riskTriggers" class="rm-tip-label" data-tip="Early warning signs that indicate the risk may be about to occur. Watch these indicators.">Early warning signs <span class="rm-tip-icon">?</span></label>
+              <input type="text" id="riskTriggers" placeholder="Indicators to watch">
+            </div>
+          </div>
+        </details>
+
+        <details class="rm-section full" id="secTracking">
+          <summary class="rm-section-head">
+            <span class="rm-section-title">Tracking</span>
+            <span class="rm-section-sub">owner, status &amp; residual risk</span>
+            <span class="rm-section-count" data-count="secTracking"></span>
+          </summary>
+          <div class="rm-section-body">
+            <div class="po-form-group">
+              <label for="riskOwner" class="rm-tip-label" data-tip="Person accountable for monitoring and managing this risk ongoing, may differ from who recorded it.">Risk owner <span class="rm-tip-icon">?</span></label>
+              <select id="riskOwner"></select>
+            </div>
+            <div class="po-form-group">
+              <label for="riskStatus" class="rm-tip-label" data-tip="Current state in your workflow: Open → Mitigating → Monitoring → Accepted or Closed.">Status <span class="rm-tip-icon">?</span></label>
+              <select id="riskStatus">
+                <option value="open">Open</option>
+                <option value="mitigating">Mitigating</option>
+                <option value="monitoring">Monitoring</option>
+                <option value="accepted">Accepted</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+            <div class="po-form-group">
+              <label for="riskResidualL" class="rm-tip-label" data-tip="Likelihood after mitigation measures. Leave empty if not yet assessed.">Residual likelihood <span class="rm-tip-icon">?</span></label>
+              <select id="riskResidualL"></select>
+            </div>
+            <div class="po-form-group">
+              <label for="riskResidualI" class="rm-tip-label" data-tip="Impact after mitigation measures. Leave empty if not yet assessed.">Residual impact <span class="rm-tip-icon">?</span></label>
+              <select id="riskResidualI"></select>
+            </div>
+            <div class="po-form-group">
+              <label for="riskReviewDue" class="rm-tip-label" data-tip="Next scheduled date to re-assess this risk: likelihood, impact, and status.">Next review <span class="rm-tip-icon">?</span></label>
+              <input type="date" id="riskReviewDue">
+            </div>
+          </div>
+        </details>
+
+        <div class="rm-recorded full">
+          <button type="button" class="rm-recorded-line" id="riskRecordedLine" onclick="toggleRecordedEdit()" title="Click to edit who recorded this risk and when"></button>
+          <div class="rm-recorded-edit" id="riskRecordedEdit" hidden>
+            <div class="po-form-group">
+              <label for="riskRecordedAt">Recorded <span class="hint">when captured</span></label>
+              <input type="date" id="riskRecordedAt" onchange="updateRecordedLine()">
+            </div>
+            <div class="po-form-group">
+              <label for="riskRecordedBy">Recorded by <span class="hint">who captured it</span></label>
+              <select id="riskRecordedBy" onchange="updateRecordedLine()"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="po-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm po-danger" id="btnDeleteRisk" hidden onclick="deleteCurrentRisk()" title="Delete this risk">Delete risk</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeRiskModal()" title="Close without saving">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="riskSaveBtn" onclick="saveRisk()" title="Save this risk">Add risk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Area modal -->
+  <div class="po-modal-bg" id="areaModalBg" onclick="modalBgClick(event,'areaModalBg')">
+    <div class="po-modal" role="dialog" aria-labelledby="areaModalTitle" onclick="event.stopPropagation()">
+      <h2 id="areaModalTitle">Add area</h2>
+      <div class="po-form-grid">
+        <div class="po-form-group">
+          <label for="areaId" class="rm-tip-label" data-tip="Short unique code for this area, shown in the risk register and in risk IDs (e.g. RSK-A01-01).">ID <span class="rm-tip-icon">?</span></label>
+          <input type="text" id="areaId" placeholder="e.g. A01">
+        </div>
+        <div class="po-form-group full">
+          <label for="areaTitle" class="rm-tip-label" data-tip="Descriptive name for this risk grouping, e.g. Vendor &amp; supply chain, Compliance, IT security.">Title <span class="rm-tip-icon">?</span></label>
+          <input type="text" id="areaTitle" placeholder="e.g. Vendor &amp; supply chain">
+        </div>
+      </div>
+      <div class="po-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm po-danger" id="btnDeleteArea" hidden onclick="deleteCurrentArea()" title="Delete this area and all risks within it">Delete area</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAreaModal()" title="Close without saving">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="saveArea()" title="Save this area">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members / admin modal -->
+  <div class="po-modal-bg" id="membersModalBg" onclick="modalBgClick(event,'membersModalBg')">
+    <div class="po-modal po-modal-wide" role="dialog" aria-labelledby="membersModalTitle" onclick="event.stopPropagation()">
+      <h2 id="membersModalTitle">Members</h2>
+      <p class="rm-members-register" id="membersRegisterLabel"></p>
+
+      <div class="rm-members-list" id="membersList"></div>
+
+      <div class="rm-members-invite" id="membersInvite" hidden>
+        <p class="section-label">Invite to this register</p>
+        <div class="po-form-group">
+          <label for="syncMemberName">Name <span class="hint">(optional, shown as owner)</span></label>
+          <input type="text" id="syncMemberName" autocomplete="off">
+        </div>
+        <div class="rm-members-invite-row">
+          <input type="email" id="syncMemberEmail" placeholder="email@…" autocomplete="off"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addSyncMember()}">
+          <button type="button" class="btn btn-secondary btn-sm" id="syncInviteBtn" onclick="addSyncMember()">Invite</button>
+        </div>
+        <p class="rm-members-invite-hint">Access is only for this register, not your other registers.</p>
+      </div>
+
+      <div class="rm-danger-zone" id="membersDangerZone" hidden>
+        <p class="section-label">Danger zone</p>
+        <button type="button" class="btn btn-secondary btn-sm po-danger" onclick="deleteCurrentRegister()">Delete register</button>
+        <span class="rm-danger-hint">Deletes this register with all areas and risks. Cannot be undone.</span>
+      </div>
+
+      <div class="po-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeMembersModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync modal -->
+  <div class="po-modal-bg" id="syncModalBg" onclick="modalBgClick(event,'syncModalBg')">
+    <div class="po-modal po-modal-wide" role="dialog" aria-labelledby="syncModalTitle">
+      <h2 id="syncModalTitle">Account</h2>
+      <p class="sync-status-line">
+        <span class="sync-dot off" id="syncDotModal"></span>
+        <span id="syncStatusText">Not signed in</span>
+      </p>
+
+      <div id="syncAuthPanel">
+        <div id="syncAuthLoginPanel">
+          <p class="sync-intro">Sign in with the account you received by email invitation. Access is per register. You only see registers you were invited to. New accounts are invite-only.</p>
+          <div class="po-form-group">
+            <label for="syncLoginEmail">Email</label>
+            <input type="email" id="syncLoginEmail" autocomplete="username">
+          </div>
+          <div class="po-form-group">
+            <label for="syncLoginPassword">Password</label>
+            <input type="password" id="syncLoginPassword" autocomplete="current-password"
+              onkeydown="if(event.key==='Enter')submitSyncLogin()">
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="submitSyncLogin()">Log in</button>
+          <button type="button" class="rm-linklike" onclick="submitPasswordReset()">Forgot password?</button>
+        </div>
+      </div>
+
+      <div id="syncLoggedIn" hidden>
+        <p class="sync-user-line">
+          Signed in as <strong id="syncUserLabel"></strong>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="submitSyncLogout()">Reset demo</button>
+        </p>
+        <p class="sync-intro">Sharing is per register. Invite and manage teammates under Members in the menu. They only join the active register, not your other registers.</p>
+      </div>
+
+      <div class="po-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeSyncModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password setup (after email invite or reset link) -->
+  <div class="po-modal-bg" id="passwordSetupBg" role="dialog" aria-labelledby="passwordSetupTitle" aria-modal="true" onclick="modalBgClick(event,'passwordSetupBg')">
+    <div class="po-modal po-modal-wide" onclick="event.stopPropagation()">
+      <h2 id="passwordSetupTitle">Set your password</h2>
+      <p class="sync-intro" id="passwordSetupIntro">You were invited to a specific register. Choose a password so you can sign in. You only get access to registers you are invited to.</p>
+      <div class="po-form-group">
+        <label for="setupName">Your name <span class="hint">shown as owner in the register</span></label>
+        <input type="text" id="setupName" autocomplete="name" placeholder="e.g. Martin">
+      </div>
+      <div class="po-form-group">
+        <label for="setupPassword">Password <span class="hint">(min. 8 characters)</span></label>
+        <input type="password" id="setupPassword" autocomplete="new-password"
+          onkeydown="if(event.key==='Enter')submitPasswordSetup()">
+      </div>
+      <div class="po-form-group">
+        <label for="setupPasswordConfirm">Confirm password</label>
+        <input type="password" id="setupPasswordConfirm" autocomplete="new-password"
+          onkeydown="if(event.key==='Enter')submitPasswordSetup()">
+      </div>
+      <div class="po-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closePasswordSetupModal()" title="Close without saving">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitPasswordSetup()">Save password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cassandra — floating chat bubble + panel -->
+  <button type="button" class="rm-bot-fab" id="botToggleBtn" onclick="toggleBotPanel()" aria-label="Chat with Cassandra, your risk coach" title="Cassandra, your risk coach" hidden>
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+      <circle cx="16" cy="15" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M16 11.5c1.8 0 3.4 1.4 3.4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M9.5 25.5h13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M25.8 7.2l1-2.4 1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1z" fill="currentColor"/>
+    </svg>
+    <span class="rm-bot-fab-dot" aria-hidden="true"></span>
+  </button>
+
+  <aside class="rm-bot" id="rmBotPanel" hidden aria-label="Cassandra, risk coach chat">
+    <div class="rm-bot-head">
+      <span class="rm-bot-avatar" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="20" height="20">
+          <circle cx="16" cy="15" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 11.5c1.8 0 3.4 1.4 3.4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M9.5 25.5h13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M25.8 7.2l1-2.4 1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1z" fill="currentColor"/>
+        </svg>
+      </span>
+      <div class="rm-bot-id">
+        <span class="rm-bot-title">Cassandra</span>
+        <span class="rm-bot-status"><span class="rm-bot-online" aria-hidden="true"></span>Risk coach · <span id="rmBotRegister"></span></span>
+      </div>
+      <button type="button" class="rm-bot-close" onclick="toggleBotPanel()" aria-label="Close chat">&times;</button>
+    </div>
+    <div class="rm-bot-msgs" id="rmBotMsgs"></div>
+    <div class="rm-bot-inputrow">
+      <textarea id="rmBotText" rows="2" placeholder="Capture a risk, ask what to focus on, prepare a review…"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendBotMessage()}"></textarea>
+      <button type="button" class="btn btn-primary btn-sm" id="rmBotSend" onclick="sendBotMessage()">Send</button>
+    </div>
+  </aside>
+
+  <footer class="site-footer">
+    <p>© 2026 Atinote</p>
+    <nav aria-label="Footer">
+      <a href="mailto:hello@atinote.ch">Contact</a>
+      <a href="https://atinote.ch/tools/">Tools</a>
+      <a href="https://atinote.ch/">Atinote</a>
+    </nav>
+  </footer>
+
+  <script type="module" src="risk-manager.js?v=2ca3c1fd"></script>
+  <script>
+    (function() {
+      const html = document.documentElement;
+      const btn = document.getElementById('themeToggle');
+      const stored = localStorage.getItem('atinote-theme');
+      if (stored) html.setAttribute('data-theme', stored);
+      btn.addEventListener('click', function() {
+        const current = html.getAttribute('data-theme');
+        const isDark = current === 'dark' ||
+          (current !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        const next = isDark ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('atinote-theme', next);
+      });
+    })();
+  </script>
+</body>
+</html>
