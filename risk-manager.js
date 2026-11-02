@@ -1765,7 +1765,7 @@ async function addSyncMember() {
   const btn = document.getElementById('syncInviteBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Inviting…'; }
   try {
-    await inviteMemberByEmail(register.id, email, 'editor', name);
+    const res = await inviteMemberByEmail(register.id, email, 'editor', name);
     document.getElementById('syncMemberEmail').value = '';
     const nameEl = document.getElementById('syncMemberName');
     if (nameEl) nameEl.value = '';
